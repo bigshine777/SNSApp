@@ -15,6 +15,8 @@ from pathlib import Path
 # プロジェクト内のパスを簡単に指定できるように、BASE_DIR を定義
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+LANGUAGE_CODE = "ja"
+TIME_ZONE = "Asia/Tokyo"
 
 # 開発用のクイックスタート設定 - 本番環境では不適切
 # 本番環境用の設定チェックリスト:
@@ -40,6 +42,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",  # メッセージフレームワーク
     "django.contrib.staticfiles",  # 静的ファイル管理
     "main",  # mainアプリケーションのインストール
+    "allauth",  # allauthの追加
+    "allauth.account",
+    "allauth.socialaccount",
 ]
 
 MIDDLEWARE = [
@@ -50,6 +55,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",  # 認証処理
     "django.contrib.messages.middleware.MessageMiddleware",  # メッセージフレームワーク
     "django.middleware.clickjacking.XFrameOptionsMiddleware",  # クリックジャッキング対策
+    "allauth.account.middleware.AccountMiddleware",
+    "django.middleware.locale.LocaleMiddleware", 
 ]
 
 # プロジェクトのルート URL 設定ファイル
@@ -86,6 +93,34 @@ DATABASES = {
     }
 }
 
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+AUTH_USER_MODEL = "main.CustomUser"
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",  # Djangoの通常認証
+    "allauth.account.auth_backends.AuthenticationBackend",  # allauth認証
+]
+
+ACCOUNT_FORMS = {
+    "signup": "main.forms.CustomSignupForm",
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+LOGIN_REDIRECT_URL = "/"  # ログイン後のリダイレクト先
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_SIGNUP_REDIRECT_URL = "/"  # サインアップ後のリダイレクト先
+
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login"  # ログアウト後のリダイレクト先
+
+import os
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # パスワードバリデーション
 # https://docs.djangoproject.com/ja/5.1/ref/settings/#auth-password-validators
